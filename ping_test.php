@@ -42,8 +42,8 @@ function notificationMail($data) {
 
 function sendMail($adresse, $objet, $message) {
 
-	require_once ('PHPMailer.php');
-	require_once ('SMTP.php');
+	require_once ('lib/PHPMailer/PHPMailer.php');
+	require_once ('lib/PHPMailer/SMTP.php');
 
 	// PHPMailer Object
 	$mail = new PHPMailer ();
