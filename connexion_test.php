@@ -8,11 +8,11 @@ echo mysql_query("SET NAMES UTF8");
 echo mysql_select_db('kiplink',$db); 
 echo '<br />';
 
-$sql = "select number from speeddial";
+$sql = "select * from speeddial limit 10";
 $req = mysql_query($sql) or die('Erreur SQL !<br>'.$sql.'<br>'.mysql_error());
 while($data = mysql_fetch_assoc($req)) 
 { 
-  echo $data['number'].'<br />';
+  echo print_r($data).'<br />';
 }
 					
 
