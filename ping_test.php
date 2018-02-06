@@ -84,9 +84,9 @@ function sendMail($adresse, $objet, $message) {
 	
 	// $mail->AltBody = "This is the plain text version of the email content";
 
-	$mail->SmtpClose ();
+	$mail->SmtpClose();
 
-	if (! $mail->send ()) {
+	if ( ! $mail->send() ) {
 
 		return $mail->ErrorInfo;
 	} else {

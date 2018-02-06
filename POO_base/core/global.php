@@ -33,3 +33,8 @@ function debug($var, $console=false) {
 		echo " -->\n";
 	}
 }
+
+function trim_value(&$value) {
+
+	$value = trim ( $value );
+}

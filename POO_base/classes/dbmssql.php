@@ -15,7 +15,7 @@ class DBMssql extends DB {
 					            		Config::get('mssql/password')
 	            					);
         	}
-        	else {
+        	else {  //DEPRECATED
 	            $this->_pdo = new PDO(	'dblib:host=' .Config::get('mssql/host')
 					            		.':' .Config::get('mssql/port')
 					            		.';dbname=' .Config::get('mssql/db')

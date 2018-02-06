@@ -1,0 +1,38 @@
+
+providers:
+  label: Fournisseurs
+  type: mysql
+  params:
+    connexion:
+      driver: pdo_mysql
+      port: null
+      host: localhost
+      basename: portail
+      username: root
+      userpwd: eclipse
+    search: match
+    view: outils_vw
+    keys: [nom, lien, description]
+
+documents:
+  label: Documents du groupe
+  type: files
+  params:
+    url: 'localhost/workdev/portail/documents/index.php?'
+    options: 'titlemode=?&query=?&apicall'
+    
+routagetel:
+  label: Annuaire IP
+  type: mysql
+  params:
+    connexion:
+      driver: pdo_mysql
+      port: null
+      host: 10.110.76.246
+      basename: kiplink
+      username: speeddial
+      userpwd: speedpass
+    search: where
+    view: speeddial
+    keys: [number, dial_number, comment]
+    
