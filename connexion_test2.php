@@ -22,7 +22,8 @@ catch (Exception $e)
 // $sql = "select * from fourn where nom_fourn like '%astrak%'";
 // $sql = "select * from fourn where c_blocage_fourn <> 'N'";
 // $sql = "select c_fourn, nom_fourn, no_cpt, n_cpte_fourn from fourn where c_blocage_fourn in ('N', '')";
-$sql = "select c_fourn, c_agence, c_cpte from fourn_cpte";
+// $sql = "select c_fourn, c_agence, c_cpte from fourn_cpte";
+$sql = "select top 5 * from agence";
 
 
 $req = $conn->prepare($sql); 
