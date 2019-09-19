@@ -34,6 +34,9 @@ function debug($var, $console=false) {
 	}
 }
 
+/*
+ * usage: array_walk($array, 'trim_value');
+ */
 function trim_value(&$value) {
 
 	$value = trim ( $value );

@@ -38,9 +38,13 @@ abstract class DB {
             	
                 $this->_results = $query->fetchAll($this->_mode);
                 $this->_count = $query->rowCount();
-            }else{
+            }
+            else{
                 $this->setError($query->errorInfo()[2] ." / Erreur de requete : {$sql}");
             }
+        }
+        else{
+            $this->setError("Erreur prepare() sur requete : {$sql}");
         }
         return $this;
     }
