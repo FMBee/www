@@ -12,15 +12,25 @@
 //     	else {
 //     		eval($code__eval);
 //     	}
-    	
         $serveur_sql = "10.106.76.111";
         $username = "sa";
         $password = "Logiwin06";
+        
 //         $base_wp = "winpneu_formation";
         $base_wp = "winpneu";
-        
-        $conn = new PDO("sqlsrv:Server={$serveur_sql},1433;Database={$base_wp}", $username, $password);
-//         $conn = new PDO("dblib:host={$serveur_sql}:1433;dbname={$base_wp}", $username, $password);
+
+        // Linux
+//         $conn = new PDO(
+// 	        "dblib:host={$serveur_sql}:1433;dbname={$base_wp};charset=utf8",
+// 	        $username,
+// 	        $password
+// 	        );
+		// Windows
+        $conn = new PDO(
+        	"sqlsrv:Server={$serveur_sql},1433;Database={$base_wp}", 
+        	$username, 
+        	$password
+        	);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
     } catch (Exception $e) {
@@ -154,7 +164,7 @@
 	        if (! $mail->send()) { // Teste si le return code est ok.
 	            echo $mail->ErrorInfo; // Affiche le message d'erreur (ATTENTION:voir section 7)
 	        } else {
-	            echo "<h3>Mail envoyé avec succès pour $c_agence</h3>";
+	            echo "Mail envoyé avec succès pour $c_agence".PHP_EOL;
 	        }
 	        $mail->smtpClose();
 		}
@@ -214,7 +224,7 @@
     if (! $mail->Send()) { 
         echo $mail->ErrorInfo; 
     } else {
-        echo "<h3>Mail envoyé avec succès pour direction</h3>";
+        echo "Mail envoyé avec succès pour direction".PHP_EOL;
     }
     
     $mail->SmtpClose();
