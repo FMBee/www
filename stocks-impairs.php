@@ -38,8 +38,8 @@
 	}
 
 	$sql = "
-		select distinct c_agence, nom_agence, mail_exp, tel_1 from agence
-		where c_agence not in ('SIAC','SICA','SIDI','SIGC','SIGM','SIL2','SILG','SIMA','SIPL','SISO','SITC','AGIP', 'XAVC','TEDE')
+    	select distinct c_agence, nom_agence, mail_exp, tel_1 from agence
+    	where c_agence not in ('XAVC','TEDE') and c_agence not like 'Z%'
 		";
 
 	$req = $conn->prepare($sql);
@@ -74,23 +74,55 @@
 			<tr><th>Article</th><th>Libellé</th><th>Stock</th><th>PX achat</th><th>Autres dépôts</th><th>Qté</th></th>
 			";
 
-
+		// si qte_stock=1  et date_mvt<15j on écarte
 		$sql_stock = "
-			select s.c_depot, s.c_art, s.qte_en_stock, round(s.px_achat,2) as 'px_achat',
-			case when s1.c_depot is NULL then '' else s1.c_depot end as 'autre_depot',
-			case when s1.qte_en_stock is NULL then '' else s1.qte_en_stock end as 'qte_autre_depot',
-			a.lib_art
-			from stock s
-			RIGHT JOIN stock s1
-			 on s1.c_art = s.c_art and s1.c_depot <> s.c_depot and cast(s1.qte_en_stock as Numeric) % 2 = 1 and s1.c_depot not in ('AGIP')
-			INNER JOIN article a
+			select rq1.* from (
+				select s.c_depot, s.c_art, s.qte_en_stock, round(s.px_achat,2) as 'px_achat',
+				case when s1.c_depot is NULL then '' else s1.c_depot end as 'autre_depot',
+				case when s1.qte_en_stock is NULL then '' else s1.qte_en_stock end as 'qte_autre_depot',
+				a.lib_art
+				from stock s
+				RIGHT JOIN stock s1
+				on s1.c_art = s.c_art
+				INNER JOIN article a
 				on a.c_art = s.c_art
-			where s.qte_en_stock in ('1','3')
-			and a.c_fam_art in ('01','02','03','04')
-			and a.c_sfam_art not in ('AU','CC','CHE','CM','DA','DI','MC','MCP','MCR','MO','RB','RP','SC','VE')
-			and s.c_depot = '$c_agence'
-			order by 1,2
-			";
+
+				where
+				s.c_depot not in ('XAVC','TEDE', 'AGIP') and s.c_depot not like 'Z%'
+				and s.qte_en_stock in ('1','3')
+				and s1.c_depot <> s.c_depot
+				and cast(s1.qte_en_stock as Numeric) % 2 = 1
+				and a.c_fam_art in ('01','02','03','04')
+				and a.c_sfam_art not in ('AU','CC','CHE','CM','DA','DI','MC','MCP','MCR','MO','RB','RP','SC','VE')
+			) rq1
+			left join (
+				select * from his_mvt_stk hm
+				where hm.c_sens = 'E'
+				and datediff(day, hm.date_mvt, getdate()) < 15
+			) rq2
+			on rq1.c_art = rq2.c_art and rq1.c_depot = rq2.c_depot and rq1.qte_en_stock = 1
+			where
+				rq2.c_art is null
+				and s.c_depot = '$c_agence'
+			order by rq1.c_depot, rq1.c_art
+		";
+
+// 		$sql_stock = "
+// 			select s.c_depot, s.c_art, s.qte_en_stock, round(s.px_achat,2) as 'px_achat',
+// 			case when s1.c_depot is NULL then '' else s1.c_depot end as 'autre_depot',
+// 			case when s1.qte_en_stock is NULL then '' else s1.qte_en_stock end as 'qte_autre_depot',
+// 			a.lib_art
+// 			from stock s
+// 			RIGHT JOIN stock s1
+// 			 on s1.c_art = s.c_art and s1.c_depot <> s.c_depot and cast(s1.qte_en_stock as Numeric) % 2 = 1 and s1.c_depot not in ('AGIP')
+// 			INNER JOIN article a
+// 				on a.c_art = s.c_art
+// 			where s.qte_en_stock in ('1','3')
+// 			and a.c_fam_art in ('01','02','03','04')
+// 			and a.c_sfam_art not in ('AU','CC','CHE','CM','DA','DI','MC','MCP','MCR','MO','RB','RP','SC','VE')
+// 			and s.c_depot = '$c_agence'
+// 			order by 1,2
+// 			";
 		// and a.c_art not in (select c_art from stock_art where qte_mini > 0 and c_depot = '$c_agence')
 		// and s.c_depot in (select c_agence from agence where c_ste = 'GOUR')";
 
@@ -193,29 +225,40 @@
 	}
 	else {
 
-		$mail->AddAddress("laurentphilip@groupegarrigue.fr");
-		$mail->AddAddress("yvesgarrigue@groupegarrigue.fr");
-		$mail->AddAddress("erichameau@groupegarrigue.fr");
-		$mail->AddAddress("jeanleonpeigneguy@groupegarrigue.fr");
-		$mail->AddAddress("vantientran@groupegarrigue.fr");
-		$mail->AddAddress("philippeduclaux@groupegarrigue.fr");
-		$mail->AddAddress("olivierbasurko@groupegarrigue.fr");
-		$mail->AddAddress("juliebelet@groupegarrigue.fr");
-		$mail->AddAddress("mathieuclara@groupegarrigue.fr");
-		$mail->AddAddress("michelfaure@groupegarrigue.fr");
-		$mail->AddAddress("cyrilleferon@groupegarrigue.com");
-		$mail->AddAddress("francislaur@groupegarrigue.fr");
-		$mail->AddAddress("antoniomartins@groupegarrigue.fr");
-		$mail->AddAddress("jeanluccresson@groupegarrigue.fr");
-		$mail->AddAddress("mathieulequin@universpneus.fr");
-		$mail->AddAddress("baptisteminet@groupegarrigue.com");
-		$mail->AddAddress("christiancovinhes@orange.fr");
-		$mail->AddAddress("fabienneaudoubert@groupegarrigue.com");
-		$mail->AddAddress("gillesmerfeld@groupegarrigue.com");
-		$mail->AddAddress("jeromegarrigue@groupegarrigue.com");
-		$mail->AddAddress("laurentcadin@groupegarrigue.com");
-		$mail->AddAddress("mathieufoures@groupegarrigue.com");
-		$mail->addBCC('fredericmevollon@universpneus.com');
+$mail->AddAddress("antoinemonier@groupegarrigue.com");
+$mail->AddAddress("antoniomartins@groupegarrigue.fr");
+$mail->AddAddress("baptisteminet@groupegarrigue.com");
+$mail->AddAddress("christiancovinhes@orange.fr");
+$mail->AddAddress("cyrilleferon@groupegarrigue.com");
+$mail->AddAddress("direction_associes@groupegarrigue.com");
+$mail->AddAddress("erichameau@groupegarrigue.fr");
+$mail->AddAddress("ericloubet@groupegarrigue.com");
+$mail->AddAddress("fabienneaudoubert@groupegarrigue.com");
+$mail->AddAddress("francislaur@groupegarrigue.fr");
+$mail->AddAddress("frederichernandez@groupegarrigue.com");
+$mail->AddAddress("gilleschahinian@groupegarrigue.com");
+$mail->AddAddress("gillesmerfeld@groupegarrigue.com");
+$mail->AddAddress("jeanleonpeigneguy@groupegarrigue.fr");
+$mail->AddAddress("jeanluccresson@groupegarrigue.fr");
+$mail->AddAddress("jeromegarrigue@groupegarrigue.com");
+$mail->AddAddress("juliebelet@groupegarrigue.fr");
+$mail->AddAddress("laurentcadin@groupegarrigue.com");
+$mail->AddAddress("laurentphilip@groupegarrigue.fr");
+$mail->AddAddress("luiscoelho@groupegarrigue.com");
+$mail->AddAddress("marcgomes@groupegarrigue.com");
+$mail->AddAddress("mathieuclara@groupegarrigue.fr");
+$mail->AddAddress("mathieufoures@groupegarrigue.com");
+$mail->AddAddress("mathieulequin@universpneus.fr");
+$mail->AddAddress("michelfaure@groupegarrigue.fr");
+$mail->AddAddress("olivierbasurko@groupegarrigue.fr");
+$mail->AddAddress("philippeduclaux@groupegarrigue.fr");
+$mail->AddAddress("philippepeyre@groupegarrigue.com");
+$mail->AddAddress("vantientran@groupegarrigue.fr");
+$mail->AddAddress("xabidrieux@groupegarrigue.com");
+$mail->AddAddress("yvesgarrigue@groupegarrigue.fr");
+
+$mail->addBCC('fredericmevollon@universpneus.com');
+
 	}
 
 	$mail->Subject = $objet;
